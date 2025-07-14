@@ -8,6 +8,7 @@
 /vendor
 /EMAIL_SETUP.md
 /NOTIFICATIONS.md
+/DEPLOYMENT.md
 .env
 .env.backup
 .env.production
