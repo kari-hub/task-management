@@ -14,9 +14,7 @@ use Illuminate\Validation\Rule;
 
 class AdminController extends Controller
 {
-    /**
-     * Get all users (excluding admin)
-     */
+    // get all users (excluding admin)
     public function getUsers(): JsonResponse
     {
         $users = User::where('role', 'user')
@@ -25,9 +23,7 @@ class AdminController extends Controller
         return response()->json(['users' => $users]);
     }
 
-    /**
-     * Get a single user with their assigned tasks
-     */
+    // get a single user with their assigned tasks
     public function getUser(User $user): JsonResponse
     {
         $user->load(['assignedTasks' => function ($query) {
@@ -37,9 +33,7 @@ class AdminController extends Controller
         return response()->json(['user' => $user]);
     }
 
-    /**
-     * Create a new user
-     */
+    // create a new user
     public function createUser(Request $request): JsonResponse
     {
         $validated = $request->validate([
@@ -68,9 +62,7 @@ class AdminController extends Controller
         ], 201);
     }
 
-    /**
-     * Update a user
-     */
+    // update a user
     public function updateUser(Request $request, User $user): JsonResponse
     {
         $validated = $request->validate([
@@ -86,7 +78,7 @@ class AdminController extends Controller
             'password.regex' => 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (!@#$%^&*()_+-=[]{}|;:,.<>?).',
         ]);
 
-        // Only hash password if it's provided
+        // only hash password if provided
         if (isset($validated['password']) && !empty($validated['password'])) {
             $validated['password'] = Hash::make($validated['password']);
         } else {
@@ -101,12 +93,10 @@ class AdminController extends Controller
         ]);
     }
 
-    /**
-     * Delete a user
-     */
+    // delete a user
     public function deleteUser(User $user): JsonResponse
     {
-        // Check if user has assigned tasks
+        // check if user has assigned tasks
         $assignedTasks = $user->assignedTasks()->where('status', '!=', Task::STATUS_COMPLETED)->count();
         
         if ($assignedTasks > 0) {
@@ -122,9 +112,7 @@ class AdminController extends Controller
         ]);
     }
 
-    /**
-     * Get all tasks (admin view)
-     */
+    // get all tasks (admin view)
     public function getAllTasks(): JsonResponse
     {
         $tasks = Task::with(['assignedTo', 'assignedBy'])
@@ -134,9 +122,7 @@ class AdminController extends Controller
         return response()->json(['tasks' => $tasks]);
     }
 
-    /**
-     * Create and assign a new task
-     */
+    // create and assign a new task
     public function assignTask(Request $request): JsonResponse
     {
         $validated = $request->validate([
@@ -155,12 +141,12 @@ class AdminController extends Controller
             'status' => Task::STATUS_PENDING,
         ]);
 
-        // Send email notification to assigned user (with error handling)
+        // send email notification to assigned user (with error handling)
         try {
             $assignedUser = User::find($validated['assigned_to']);
             $assignedUser->notify(new TaskAssignedNotification($task));
         } catch (\Exception $e) {
-            // Log the error but don't fail the task creation
+            // log the error but don't fail the task creation
             Log::error('Failed to send task assignment notification: ' . $e->getMessage());
         }
 
@@ -170,9 +156,7 @@ class AdminController extends Controller
         ], 201);
     }
 
-    /**
-     * Update a task (admin can update any task)
-     */
+    // update a task (admin can update any task)
     public function updateTask(Request $request, Task $task): JsonResponse
     {
         $validated = $request->validate([
@@ -186,7 +170,7 @@ class AdminController extends Controller
         $oldAssignedTo = $task->assigned_to;
         $task->update($validated);
 
-        // Send notification if task was reassigned to a different user
+        // send notification if task was reassigned to a different user
         if (isset($validated['assigned_to']) && $validated['assigned_to'] != $oldAssignedTo) {
             try {
                 $newAssignedUser = User::find($validated['assigned_to']);
@@ -204,9 +188,7 @@ class AdminController extends Controller
         ]);
     }
 
-    /**
-     * Delete a task
-     */
+    // delete a task
     public function deleteTask(Task $task): JsonResponse
     {
         $task->delete();
@@ -216,9 +198,7 @@ class AdminController extends Controller
         ]);
     }
 
-    /**
-     * Get dashboard statistics
-     */
+    // get dashboard statistics
     public function getDashboardStats(): JsonResponse
     {
         $stats = [

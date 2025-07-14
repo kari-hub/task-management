@@ -68,9 +68,8 @@ class User extends Authenticatable
         $this->two_factor_expires_at = null;
         $this->save();
     }
-    /**
-     * Get the user's initials
-     */
+
+    // get the user's initials
     public function initials(): string
     {
         return Str::of($this->name)
@@ -80,33 +79,25 @@ class User extends Authenticatable
             ->implode('');
     }
 
-    /**
-     * Check if the user is an admin
-     */
+    // check if the user is an admin
     public function isAdmin(): bool
     {
         return $this->role === 'admin';
     }
 
-    /**
-     * Check if the user is a regular user
-     */
+    // check if the user is a regular user
     public function isUser(): bool
     {
         return $this->role === 'user';
     }
 
-    /**
-     * Get tasks assigned to this user
-     */
+    // get tasks assigned to this user
     public function assignedTasks()
     {
         return $this->hasMany(Task::class, 'assigned_to');
     }
 
-    /**
-     * Get tasks created by this user (for admins)
-     */
+    // get tasks created by this user (for admins)
     public function createdTasks()
     {
         return $this->hasMany(Task::class, 'assigned_by');

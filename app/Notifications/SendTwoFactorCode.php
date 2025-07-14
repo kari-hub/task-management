@@ -36,7 +36,7 @@ class SendTwoFactorCode extends Notification
     {
         return (new MailMessage)
             ->line('Your two-factor code is: {$notifiable->two_factor_code}')
-            ->action('Verify Here', route('verify.index'))
+            ->action('Verify Here', route('dashboard'))
             ->line('The code will expire in 10 minutes.')
             ->line('If you did not request this code, please ignore this email.');
     }

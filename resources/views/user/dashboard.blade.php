@@ -282,11 +282,11 @@
             // Status badge logic - respect current filter
             let statusBadge = '';
             
-            // If we're filtering by a specific status (not "overdue" or empty), show only that status
+            // filter by a specific status
             if (currentFilter && currentFilter !== 'overdue') {
                 statusBadge = `<span class="px-2 py-1 text-xs font-semibold rounded-full ${getStatusClass(task.status)}">${task.status.replace('_', ' ')}</span>`;
             } else {
-                // Priority system for status badges: OVERDUE > DUE SOON > Status (only when not filtering by specific status)
+                // priority system for status badges: OVERDUE > DUE SOON > Status (only when not filtering by specific status)
                 if (isOverdue) {
                     statusBadge = '<span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">OVERDUE</span>';
                 } else if (isDueSoon) {
@@ -346,7 +346,7 @@
             
             if (statusFilter) {
                 if (statusFilter === 'overdue') {
-                    // Filter for tasks that are overdue (past deadline) and not completed
+                    // filter for tasks that are overdue (past deadline) and not completed
                     filteredTasks = filteredTasks.filter(task => {
                         const deadline = new Date(task.deadline);
                         const now = new Date();
@@ -392,17 +392,17 @@
             .then(response => response.json())
             .then(data => {
                 if (data.message) {
-                    // Update the task in our local array
+                    // update the task in our local array
                     const taskIndex = allTasks.findIndex(task => task.id === taskId);
                     if (taskIndex !== -1) {
                         allTasks[taskIndex].status = newStatus;
                     }
                     
-                    // Refresh display and stats
+                    // refresh display and stats
                     displayTasks(allTasks);
                     loadTaskStats();
                     
-                    // Show success message
+                    // show success message
                     showNotification(data.message, 'success');
                 }
             })
@@ -495,13 +495,13 @@
         }
 
         function showNotification(message, type) {
-            // Simple notification - you can enhance this with a proper notification library
+            // simple notification - you can enhance this with a proper notification library
             alert(message);
         }
 
 
 
-        // Close modal when pressing Escape key
+        // close modal when pressing Escape key
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && !document.getElementById('taskModal').classList.contains('hidden')) {
                 closeTaskModal();

@@ -31,7 +31,7 @@ class SendDueSoonTaskNotifications extends Command
     {
         $days = (int) $this->option('days');
         
-        // Get tasks due within the specified days that haven't been completed
+        // get tasks due within the specified days that haven't been completed
         $dueSoonTasks = Task::with(['assignedTo', 'assignedBy'])
             ->where('status', '!=', 'completed')
             ->where('deadline', '>=', now())
@@ -45,7 +45,7 @@ class SendDueSoonTaskNotifications extends Command
 
         foreach ($dueSoonTasks as $task) {
             try {
-                // Send custom due soon notification
+                // send custom due soon notification
                 $task->assignedTo->notify(new class($task) extends \Illuminate\Notifications\Notification {
                     use \Illuminate\Bus\Queueable;
                     use \Illuminate\Contracts\Queue\ShouldQueue;

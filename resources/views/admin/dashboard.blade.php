@@ -16,9 +16,6 @@
                 <button onclick="openTaskModal()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">
                     New Task
                 </button>
-                <button onclick="testTaskCreation()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg">
-                    Test API
-                </button>
             </div>
         </div>
 
@@ -319,35 +316,35 @@
     </style>
 
     <script>
-        // Load data when page loads
+        // load data when page loads
         document.addEventListener('DOMContentLoaded', function() {
             loadDashboardStats();
             loadUsers();
             loadTasks();
         });
 
-        // Tab functionality
+        // tab functionality
         function showTab(tabName) {
-            // Hide all tab contents
+            // hide all tab contents
             document.querySelectorAll('.tab-content').forEach(content => {
                 content.classList.add('hidden');
             });
             
-            // Remove active class from all tab buttons
+            // remove active class from all tab buttons
             document.querySelectorAll('.tab-button').forEach(button => {
                 button.classList.remove('active', 'border-blue-500', 'text-blue-600', 'dark:text-blue-400');
                 button.classList.add('border-transparent', 'text-gray-500', 'dark:text-gray-400');
             });
             
-            // Show selected tab content
+            // show selected tab content
             document.getElementById(tabName + '-tab').classList.remove('hidden');
             
-            // Add active class to selected tab button
+            // add active class to selected tab button
             event.target.classList.add('active', 'border-blue-500', 'text-blue-600', 'dark:text-blue-400');
             event.target.classList.remove('border-transparent', 'text-gray-500', 'dark:text-gray-400');
         }
 
-        // Load dashboard statistics
+        // load dashboard statistics
         function loadDashboardStats() {
             fetch('/api/admin/stats')
                 .then(response => response.json())
@@ -360,7 +357,7 @@
                 .catch(error => console.error('Error loading stats:', error));
         }
 
-        // Load users
+        // load users
         function loadUsers() {
             fetch('/api/admin/users')
                 .then(response => response.json())
@@ -371,7 +368,7 @@
                 .catch(error => console.error('Error loading users:', error));
         }
 
-        // Load tasks
+        // load tasks
         function loadTasks() {
             fetch('/api/admin/tasks')
                 .then(response => response.json())
@@ -382,7 +379,7 @@
                 .catch(error => console.error('Error loading tasks:', error));
         }
 
-        // Modal functions
+        // modal functions
         let currentEditingUserId = null;
 
         function openUserModal() {
@@ -411,7 +408,7 @@
             document.getElementById('taskForm').reset();
         }
 
-        // Load users for task assignment dropdown
+        // load users for task assignment dropdown
         function loadUsersForTaskAssignment() {
             fetch('/api/admin/users')
                 .then(response => response.json())
@@ -426,7 +423,7 @@
                 .catch(error => console.error('Error loading users for assignment:', error));
         }
 
-        // Form submissions
+        // form submissions
         document.getElementById('userForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
@@ -435,7 +432,7 @@
                 email: document.getElementById('userEmail').value
             };
 
-            // Add password only if provided (for updates) or required (for new users)
+            // add password only if provided (for updates) or required (for new users)
             const password = document.getElementById('userPassword').value;
             if (password || currentEditingUserId === null) {
                 formData.password = password;
@@ -473,13 +470,13 @@
         document.getElementById('taskForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            // Get form values
+            // get form values
             const title = document.getElementById('taskTitle').value.trim();
             const description = document.getElementById('taskDescription').value.trim();
             const assignedTo = document.getElementById('taskAssignedTo').value;
             const deadline = document.getElementById('taskDeadline').value;
             
-            // Validate form
+            // validate form
             if (!title) {
                 alert('Please enter a task title');
                 return;
@@ -534,11 +531,11 @@
             });
         });
 
-        // Filter functions
+        // filter functions
         let allAdminTasks = [];
         let allAdminUsers = [];
 
-        // Filter admin tasks
+        // filter admin tasks
         function filterAdminTasks() {
             const statusFilter = document.getElementById('taskStatusFilter').value;
             const searchTerm = document.getElementById('taskSearch').value.toLowerCase();
@@ -547,7 +544,7 @@
             
             if (statusFilter) {
                 if (statusFilter === 'overdue') {
-                    // Filter for tasks that are overdue (past deadline) and not completed
+                    // filter for tasks that are overdue (past deadline) and not completed
                     filteredTasks = filteredTasks.filter(task => {
                         const deadline = new Date(task.deadline);
                         const now = new Date();
@@ -568,7 +565,7 @@
             displayAdminTasks(filteredTasks, statusFilter);
         }
 
-        // Filter admin users
+        // filter admin users
         function filterAdminUsers() {
             const searchTerm = document.getElementById('userSearch').value.toLowerCase();
             
@@ -584,7 +581,7 @@
             displayAdminUsers(filteredUsers);
         }
 
-        // Display admin tasks
+        // display admin tasks
         function displayAdminTasks(tasks, currentFilter = '') {
             const container = document.getElementById('tasksContainer');
             container.innerHTML = '';
@@ -599,14 +596,14 @@
                 const isOverdue = new Date(task.deadline) < new Date() && task.status !== 'completed';
                 const isDueSoon = new Date(task.deadline) <= new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) && new Date(task.deadline) >= new Date() && task.status !== 'completed';
                 
-                // Status badge logic - respect current filter
+                // status badge logic - respect current filter
                 let statusBadge = '';
                 
-                // If we're filtering by a specific status (not "overdue" or empty), show only that status
+                // filter by a specific status
                 if (currentFilter && currentFilter !== 'overdue') {
                     statusBadge = `<span class="px-2 py-1 text-xs font-semibold rounded-full ${statusClass}">${task.status.replace('_', ' ')}</span>`;
                 } else {
-                    // Priority system for status badges: OVERDUE > DUE SOON > Status (only when not filtering by specific status)
+                    // priority system for status badges: OVERDUE > DUE SOON > Status (only when not filtering by specific status)
                     if (isOverdue) {
                         statusBadge = '<span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">OVERDUE</span>';
                     } else if (isDueSoon) {
@@ -655,7 +652,7 @@
             });
         }
 
-        // Display admin users
+        // display admin users
         function displayAdminUsers(users) {
             const tbody = document.getElementById('usersTableBody');
             tbody.innerHTML = '';
@@ -700,7 +697,7 @@
             }
         }
 
-        // Edit user function
+        // edit user function
         function editUser(userId) {
             currentEditingUserId = userId;
             document.getElementById('userModalTitle').textContent = 'Edit User';
@@ -728,7 +725,7 @@
                 });
         }
 
-        // Display user's tasks
+        // display user's tasks
         function displayUserTasks(tasks) {
             const container = document.getElementById('userTasksList');
             
@@ -770,15 +767,15 @@
 
 
 
-        // Reassign task
+        // reassign task
         function reassignTask(taskId) {
-            // Get all users for reassignment dropdown
+            // get all users for reassignment dropdown
             fetch('/api/admin/users')
                 .then(response => response.json())
                 .then(data => {
                     const users = data.users;
                     
-                    // Create reassignment modal
+                    // create reassignment modal
                     const reassignModal = `
                         <div id="reassignModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50" onclick="closeReassignModal()">
                             <div class="flex items-center justify-center min-h-screen p-4" onclick="event.stopPropagation()">
@@ -813,7 +810,7 @@
                         </div>
                     `;
                     
-                    // Add modal to page
+                    // add modal to page
                     document.body.insertAdjacentHTML('beforeend', reassignModal);
                 })
                 .catch(error => {
@@ -822,7 +819,7 @@
                 });
         }
 
-        // Close reassign modal
+        // close reassign modal
         function closeReassignModal() {
             const modal = document.getElementById('reassignModal');
             if (modal) {
@@ -830,7 +827,7 @@
             }
         }
 
-        // Confirm task reassignment
+        // confirm task reassignment
         function confirmReassignTask(taskId) {
             const newUserId = document.getElementById('reassignUserSelect').value;
             
@@ -855,7 +852,7 @@
                     alert(data.message);
                     closeReassignModal();
                     
-                    // Refresh the user's tasks if we're in edit mode
+                    // refresh the user's tasks if in edit mode
                     if (currentEditingUserId) {
                         fetch(`/api/admin/users/${currentEditingUserId}`)
                             .then(response => response.json())
@@ -865,7 +862,7 @@
                             .catch(error => console.error('Error refreshing user tasks:', error));
                     }
                     
-                    // Also refresh the main tasks list
+                    // also refresh the main tasks list
                     loadTasks();
                     loadDashboardStats();
                 }
@@ -916,7 +913,7 @@
             }
         }
 
-        // Refresh data function
+        // refresh data function
         function refreshData() {
             loadDashboardStats();
             loadUsers();
@@ -926,7 +923,7 @@
 
 
 
-        // Close modals when pressing Escape key
+        // close modals when pressing Escape key
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 if (!document.getElementById('userModal').classList.contains('hidden')) {
@@ -942,11 +939,11 @@
         });
 
         function showNotification(message, type) {
-            // Simple notification - you can enhance this with a proper notification library
+            // simple notification
             alert(message);
         }
 
-        // Test function to debug task creation
+        // test function to debug task creation
         function testTaskCreation() {
             const testData = {
                 title: 'Test Task',

@@ -8,18 +8,12 @@ use Carbon\Carbon;
 
 class Task extends Model
 {
-    /**
-     * Task status constants
-     */
+    // task status constants
     const STATUS_PENDING = 'pending';
     const STATUS_IN_PROGRESS = 'in_progress';
     const STATUS_COMPLETED = 'completed';
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<string>
-     */
+    // the attributes that are mass assignable
     protected $fillable = [
         'title',
         'description',
@@ -29,11 +23,7 @@ class Task extends Model
         'status',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
+    // get the attributes that should be cast
     protected function casts(): array
     {
         return [
@@ -41,49 +31,37 @@ class Task extends Model
         ];
     }
 
-    /**
-     * Get the user this task is assigned to
-     */
+    // get the user this task is assigned to
     public function assignedTo(): BelongsTo
     {
         return $this->belongsTo(User::class, 'assigned_to');
     }
 
-    /**
-     * Get the user who created/assigned this task
-     */
+    // get the user who created/assigned this task
     public function assignedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'assigned_by');
     }
 
-    /**
-     * Check if the task is overdue
-     */
+    // check if the task is overdue
     public function isOverdue(): bool
     {
         return $this->deadline < Carbon::now() && $this->status !== self::STATUS_COMPLETED;
     }
 
-    /**
-     * Check if the task is due today
-     */
+    // check if the task is due today
     public function isDueToday(): bool
     {
         return $this->deadline->isToday();
     }
 
-    /**
-     * Check if the task is due soon (within 3 days)
-     */
+    // check if the task is due soon (within 3 days)
     public function isDueSoon(): bool
     {
         return $this->deadline->diffInDays(Carbon::now()) <= 3 && $this->status !== self::STATUS_COMPLETED;
     }
 
-    /**
-     * Get CSS class for status display
-     */
+    // get CSS class for status display
     public function getStatusColor(): string
     {
         return match($this->status) {
@@ -94,17 +72,13 @@ class Task extends Model
         };
     }
 
-    /**
-     * Check if a user can update this task
-     */
+    // check if a user can update this task
     public function canBeUpdatedBy(User $user): bool
     {
         return $user->isAdmin() || $this->assigned_to === $user->id;
     }
 
-    /**
-     * Get all available statuses
-     */
+    // get all available statuses
     public static function getAvailableStatuses(): array
     {
         return [
@@ -114,34 +88,26 @@ class Task extends Model
         ];
     }
 
-    /**
-     * Scope to get tasks assigned to a specific user
-     */
+    // scope to get tasks assigned to a specific user
     public function scopeAssignedTo($query, $userId): object
     {
         return $query->where('assigned_to', $userId);
     }
 
-    /**
-     * Scope to get tasks by status
-     */
+    // scope to get tasks by status
     public function scopeByStatus($query, $status): object
     {
         return $query->where('status', $status);
     }
 
-    /**
-     * Scope to get overdue tasks
-     */
+    // scope to get overdue tasks
     public function scopeOverdue($query)
     {
         return $query->where('deadline', '<', Carbon::now())
                     ->where('status', '!=', self::STATUS_COMPLETED);
     }
 
-    /**
-     * Scope to get tasks due soon
-     */
+    // scope to get tasks due soon
     public function scopeDueSoon($query)
     {
         return $query->where('deadline', '<=', Carbon::now()->addDays(3))

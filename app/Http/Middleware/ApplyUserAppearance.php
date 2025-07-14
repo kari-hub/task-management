@@ -18,25 +18,28 @@ class ApplyUserAppearance
     {
         $response = $next($request);
 
-        // Only apply to authenticated users
-        if (Auth::check()) {
-            $user = Auth::user();
-            $appearance = $user->appearance ?? 'system';
-
-            // Apply the appearance class to the HTML element
-            if ($response->headers->get('content-type') && str_contains($response->headers->get('content-type'), 'text/html')) {
-                $content = $response->getContent();
-                
-                // For system preference, we'll let JavaScript handle it
-                // For light/dark, apply directly
-                $htmlClass = $appearance === 'system' ? 'system' : $appearance;
-                
-                // Replace the default class with the user's preference
-                $content = preg_replace('/<html[^>]*class="[^"]*"/', '<html class="' . $htmlClass . '"', $content);
-                
-                $response->setContent($content);
-            }
+        // Only apply to authenticated users and HTML responses
+        if (!Auth::check() || 
+            !$response->headers->get('content-type') || 
+            !str_contains($response->headers->get('content-type'), 'text/html')) {
+            return $response;
         }
+
+        $user = Auth::user();
+        $appearance = $user->appearance ?? 'system';
+
+        // Skip processing if appearance is system (let JavaScript handle it)
+        if ($appearance === 'system') {
+            return $response;
+        }
+
+        $content = $response->getContent();
+        
+        // Apply the appearance class to the HTML element
+        $htmlClass = $appearance;
+        $content = preg_replace('/<html[^>]*class="[^"]*"/', '<html class="' . $htmlClass . '"', $content);
+        
+        $response->setContent($content);
 
         return $response;
     }

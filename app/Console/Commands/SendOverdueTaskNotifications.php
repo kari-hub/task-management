@@ -30,7 +30,7 @@ class SendOverdueTaskNotifications extends Command
     {
         $days = (int) $this->option('days');
         
-        // Get overdue tasks that haven't been completed
+        // get overdue tasks that haven't been completed
         $overdueTasks = Task::with(['assignedTo', 'assignedBy'])
             ->where('status', '!=', 'completed')
             ->where('deadline', '<', now()->subDays($days))
@@ -43,7 +43,7 @@ class SendOverdueTaskNotifications extends Command
 
         foreach ($overdueTasks as $task) {
             try {
-                // Send notification to the assigned user
+                // send notification to the assigned user
                 $task->assignedTo->notify(new TaskOverdueNotification($task));
                 $notifiedCount++;
                 

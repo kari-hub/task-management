@@ -42,9 +42,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
         $this->redirectIntended(route('dashboard', absolute: false), navigate: true);
     }
 
-    /**
-     * Get password strength score
-     */
+     // get password strength score
     public function getPasswordStrength(): array
     {
         if (empty($this->password)) {
@@ -62,7 +60,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
             $checks['length'] = false;
         }
 
-        // Lowercase check
+        // lowercase check
         if (preg_match('/[a-z]/', $this->password)) {
             $score += 1;
             $checks['lowercase'] = true;
@@ -70,7 +68,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
             $checks['lowercase'] = false;
         }
 
-        // Uppercase check
+        // uppercase check
         if (preg_match('/[A-Z]/', $this->password)) {
             $score += 1;
             $checks['uppercase'] = true;
@@ -78,7 +76,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
             $checks['uppercase'] = false;
         }
 
-        // Number check
+        // number check
         if (preg_match('/\d/', $this->password)) {
             $score += 1;
             $checks['number'] = true;
@@ -86,7 +84,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
             $checks['number'] = false;
         }
 
-        // Special character check
+        // special character check
         if (preg_match('/[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]/', $this->password)) {
             $score += 1;
             $checks['special'] = true;
@@ -94,7 +92,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
             $checks['special'] = false;
         }
 
-        // Determine strength label and color
+        // determine strength label and color
         $label = '';
         $color = 'gray';
         
@@ -123,9 +121,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
         ];
     }
 
-    /**
-     * Get password confirmation status
-     */
+    // get password confirmation status
     public function getPasswordConfirmationStatus(): array
     {
         if (empty($this->password_confirmation)) {

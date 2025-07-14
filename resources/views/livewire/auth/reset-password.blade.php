@@ -46,9 +46,9 @@ new #[Layout('components.layouts.auth')] class extends Component {
             'password.regex' => 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (!@#$%^&*()_+-=[]{}|;:,.<>?).',
         ]);
 
-        // Here we will attempt to reset the user's password. If it is successful we
-        // will update the password on an actual user model and persist it to the
-        // database. Otherwise we will parse the error and return the response.
+        // attempt to reset the user's password. If it is successful,
+        // update the password on an actual user model and persist it to the
+        // database. Otherwise, parse the error and return the response.
         $status = Password::reset(
             $this->only('email', 'password', 'password_confirmation', 'token'),
             function ($user) {
@@ -61,23 +61,20 @@ new #[Layout('components.layouts.auth')] class extends Component {
             }
         );
 
-        // If the password was successfully reset, we will redirect the user back to
-        // the application's home authenticated view. If there is an error we can
-        // redirect them back to where they came from with their error message.
+        // if the password was successfully reset, redirect user back to the application's home authenticated view. 
+        // if there is an error, add an error to the email field.
         if ($status != Password::PasswordReset) {
             $this->addError('email', __($status));
 
             return;
-        }
+        };
 
         Session::flash('status', __($status));
 
         $this->redirectRoute('login', navigate: true);
     }
 
-    /**
-     * Get password strength score
-     */
+    // get password strength score
     public function getPasswordStrength(): array
     {
         if (empty($this->password)) {
@@ -87,7 +84,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
         $score = 0;
         $checks = [];
 
-        // Length check
+        // length check
         if (strlen($this->password) >= 8) {
             $score += 1;
             $checks['length'] = true;
@@ -95,7 +92,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
             $checks['length'] = false;
         }
 
-        // Lowercase check
+        // lowercase check
         if (preg_match('/[a-z]/', $this->password)) {
             $score += 1;
             $checks['lowercase'] = true;
@@ -103,7 +100,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
             $checks['lowercase'] = false;
         }
 
-        // Uppercase check
+        // uppercase check
         if (preg_match('/[A-Z]/', $this->password)) {
             $score += 1;
             $checks['uppercase'] = true;
@@ -111,7 +108,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
             $checks['uppercase'] = false;
         }
 
-        // Number check
+        // number check
         if (preg_match('/\d/', $this->password)) {
             $score += 1;
             $checks['number'] = true;
@@ -119,7 +116,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
             $checks['number'] = false;
         }
 
-        // Special character check
+        // special character check
         if (preg_match('/[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]/', $this->password)) {
             $score += 1;
             $checks['special'] = true;
@@ -127,7 +124,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
             $checks['special'] = false;
         }
 
-        // Determine strength label and color
+        // determine strength label and color
         $label = '';
         $color = 'gray';
         
@@ -155,7 +152,23 @@ new #[Layout('components.layouts.auth')] class extends Component {
             'checks' => $checks
         ];
     }
-}; ?>
+
+    // get password confirmation status
+    public function getPasswordConfirmationStatus(): array
+    {
+        if (empty($this->password_confirmation)) {
+            return ['status' => 'empty', 'message' => '', 'color' => 'gray'];
+        }
+
+        if ($this->password === $this->password_confirmation) {
+            return ['status' => 'match', 'message' => 'Passwords match', 'color' => 'green'];
+        } else {
+            return ['status' => 'mismatch', 'message' => 'Passwords do not match', 'color' => 'red'];
+        }
+    }
+};
+
+ ?>
 
 <div class="flex flex-col gap-6">
     <x-auth-header :title="__('Reset password')" :description="__('Enter your new password below')" />
@@ -194,11 +207,11 @@ new #[Layout('components.layouts.auth')] class extends Component {
                     <!-- Strength Bar -->
                     <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                         <div class="h-2 rounded-full transition-all duration-300 {{ 
-                            $strength['color'] === 'red' ? 'bg-red-500' :
+                            ($strength['color'] === 'red' ? 'bg-red-500' :
                             ($strength['color'] === 'orange' ? 'bg-orange-500' :
                             ($strength['color'] === 'yellow' ? 'bg-yellow-500' :
                             ($strength['color'] === 'blue' ? 'bg-blue-500' :
-                            ($strength['color'] === 'green' ? 'bg-green-500' : 'bg-gray-500'))))
+                            ($strength['color'] === 'green' ? 'bg-green-500' : 'bg-gray-500')))))
                         }}"
                             style="width: {{ ($strength['score'] / 5) * 100 }}%">
                         </div>
@@ -208,12 +221,12 @@ new #[Layout('components.layouts.auth')] class extends Component {
                     <div class="flex items-center justify-between text-sm">
                         <span class="text-gray-600 dark:text-gray-400">Password Strength:</span>
                         <span class="font-medium {{
-                            $strength['color'] === 'red' ? 'text-red-600 dark:text-red-400' :
-                            ($strength['color'] === 'orange') ? 'text-orange-600 dark:text-orange-400':
-                            ($strength['color'] ==='yellow') ? 'text-yellow-600 dark:text-yellow-400':
-                            ($strength['color'] ==='blue') ? 'text-blue-600 dark:text-blue-400':
-                            ($strength['color'] ==='green') ? 'text-green-600 dark:text-green-400':
-                            'text-gray-600 dark:text-gray-400'
+                            ($strength['color'] === 'red' ? 'text-red-600 dark:text-red-400' :
+                            ($strength['color'] === 'orange' ? 'text-orange-600 dark:text-orange-400' :
+                            ($strength['color'] === 'yellow' ? 'text-yellow-600 dark:text-yellow-400' :
+                            ($strength['color'] === 'blue' ? 'text-blue-600 dark:text-blue-400' :
+                            ($strength['color'] === 'green' ? 'text-green-600 dark:text-green-400' :
+                            'text-gray-600 dark:text-gray-400')))))
                         }}">
                             {{ $strength['label'] }}
                         </span>
