@@ -6,10 +6,7 @@
 /storage/*.key
 /storage/pail
 /vendor
-/EMAIL_SETUP.md
-/NOTIFICATIONS.md
-/DEPLOYMENT.md
-/RAILWAY_ENV_SETUP.md
+
 .env
 .env.backup
 .env.production
